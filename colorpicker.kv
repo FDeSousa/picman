@@ -1,0 +1,14 @@
+#:kivy 1.10.1
+
+<ColorPickerLayout>:
+    orientation: 'vertical'
+    ti: ti
+
+    ColorPicker:
+        id: cp
+        # color: ti.text=str([self.r/255.0, self.g/255.0, self.b/255.0, self.a/255.0])
+        color: root.color_change(self.r, self.g, self.b, self.a)
+
+    TextInput:
+        id: ti
+        text: ""

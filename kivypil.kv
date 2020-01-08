@@ -1,0 +1,155 @@
+#:kivy 1.10.1
+
+#:import SimpleTableLayout kivy.garden.simpletablelayout.SimpleTableLayout
+
+<PropertyLabel@Label>:
+    bcolor: 0, 0, 0, 1
+    foreground_color: 1, 1, 1, 1
+    height: sp(20)
+    text_size: self.size
+    padding_x: 5
+    padding_y: 5
+
+
+<PropertyText@TextInput>:
+    bcolor: 1, 1, 1, 1
+    foreground_color: 0, 0, 0, 1
+    height: sp(20)
+    readonly: True
+
+
+<Sidebar@Splitter>:
+    sizable_from: 'right'
+    strip_size: '5pt'
+    keep_within_parent: True
+    rescale_with_parent: False
+    min_size: 300
+    max_size: 800
+    width: 600
+
+
+<SelectablePicture@BoxLayout>:
+    orientation: 'vertical'
+    size_hint_y: None
+    height: self.ids.image.height + self.ids.source.height
+
+    canvas:
+        Color:
+            rgba: self.background_colour
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+    canvas.after:
+        Color:
+            rgba: self.border_colour
+        Line:
+            rectangle: (self.x, self.y, self.width, self.height)
+            width: dp(3)
+
+    Image:
+        id: image
+        texture: root.texture
+        source: None if root.texture else root.source
+        size_hint: (None, None)
+        allow_stretch: True
+        keep_ratio: True
+        width: self.parent.width
+        height: self.parent.width / self.image_ratio
+
+    Label:
+        id: source
+        text: root.source.split('/')[-1].split('\\')[-1].split('.')[0]
+        height: dp(20)
+        width: self.parent.width
+        text_size: self.width, self.height
+        halign: 'center'
+        valign: 'top'
+
+
+<MetadataTable@SimpleTableLayout>:
+    cols: 1
+    rows: 1
+    height: self.rows * sp(20)
+    size_hint_y: None
+    spacing: 10
+
+
+ScreenManager:
+    id: screen_manager
+
+    ImageLibraryScreen:
+        id: image_library_screen
+        name: 'ImageLibraryScreen'
+        manager: screen_manager
+
+
+<ImageLibraryScreen>:
+    orientation: 'horizontal'
+
+    BoxLayout:
+        id: image_library_screen_layout
+
+        Sidebar:
+            id: metadata_layout
+            size_hint: (0.3, 1.0)
+            layout_content: metadata_scrollview
+
+            ScrollView:
+                id: metadata_scrollview
+                size: self.size
+                do_scroll_x: False
+                do_scroll_y: True
+                scroll_type: ['bars', 'content']
+                bar_margin: dp(20)
+                bar_width: dp(20)
+
+                MetadataTable:
+                    id: metadata_table
+
+                    PropertyLabel:
+                        text: "No images selected."
+                        halign: 'center'
+                        valign: 'top'
+
+        BoxLayout:
+            orientation: 'vertical'
+            spacing: 10
+
+            StackLayout:
+                orientation: 'rl-tb'
+                size_hint: (1.0, None)
+                width: sp(240)
+                height: sp(25)
+
+                Slider:
+                    id: col_count_slider
+                    min: 2
+                    max: 10
+                    value: 5
+                    step: 1
+                    size_hint: (None, 1.0)
+                    width: sp(200)
+                    height: sp(25)
+
+                Label:
+                    id: col_count_label
+                    text: str(col_count_slider.value)
+                    halign: 'right'
+                    size_hint: (None, 1.0)
+                    width: sp(25)
+                    height: sp(25)
+                    text_size: self.size
+
+            ScrollView:
+                size: self.size
+                do_scroll_x: False
+                do_scroll_y: True
+
+                SelectableGrid:
+                    id: image_layout
+                    cols: col_count_slider.value
+                    # height: self.minimum_height
+                    row_force_default: False
+                    spacing: (dp(5), dp(5))
+                    padding: (dp(2), dp(2), dp(2), dp(2))
